@@ -1,0 +1,34 @@
+{
+  "name": "Address-Book",
+  "version": "1.0.0",
+  "description": "Address book application",
+  "main": "public/index.html",
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start",
+    "test-once": "npm run test -- --single-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MatthewReuther/Address-Book.git"
+  },
+  "author": "Matthew Reuther",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MatthewReuther/Address-Book/issues"
+  },
+  "homepage": "https://github.com/MatthewReuther/Address-Book",
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "codeclimate-test-reporter": "0.0.4",
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-coverage": "^0.2.7",
+    "karma-coveralls": "^0.1.5",
+    "karma-firefox-launcher": "^0.1.4",
+    "karma-mocha": "^0.1.10",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "mocha": "^2.1.0",
+    "mocha-phantomjs": "^3.5.3",
+    "phantomjs": "^1.9.15"
+  }
+}
