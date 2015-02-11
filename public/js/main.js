@@ -9,8 +9,8 @@ $(document).ready(function() {
   });
 });
 
-var FIREBASE_URL   = 'address-book-application.firebaseio.com/contactList',
-    mainUrl        = 'address-book-application.firebaseio.com',
+var FIREBASE_URL   = 'https//address-book-application.firebaseio.com/contactList',
+    mainUrl        = 'https://address-book-application.firebaseio.com',
     fb             = new Firebase(mainUrl),
     usersFbUrl;
 
@@ -19,13 +19,15 @@ if (fb.getAuth()) {
   $('.login').remove();
   $('.app').toggleClass('hidden');
 
-  $.get(FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data/contactList.json', function(data){
-    if(data !== null) {
-      Object.keys(data).forEach(function(uuid) {
-        addContactToTable(uuid, data[uuid]);
-      });
-    }
-  });
+  usersFbUrl = mainUrl + '/users/' + fb.getAuth().uid + '/data/';
+
+  $.get(usersFbUrl + 'contactList/.json', function(data){
+  if(data !== null) {
+    Object.keys(data).forEach(function(uuid) {
+      addRowToTable(uuid, data[uuid]);
+    });
+   }
+ });
 }
 
 $('.login input[type="button"]').click(function () {
@@ -82,7 +84,7 @@ function registerAndLogin(obj, cb) {
 }
 
 
-$.get('https://address-book-application.firebaseio.com/contactList.json', function(res){
+$.get(usersFbUrl + 'contactList/.json', function(res){
   Object.keys(res).forEach(function(uuid){
     addRowToTable(uuid,res[uuid]);
   });
@@ -115,7 +117,7 @@ $('#submitNewContact').on('click', function(event){
 
   // post form data to firebase url
   var data = JSON.stringify({name: contactName, phone: contactPhone, email: contactEmail, twitter: contactTwitter, photoUrl: contactPhoto});
-  $.post(FIREBASE_URL, data, function(res){
+  $.post(usersFbUrl + 'contactList/.json', data, function(res){
     // add firebase uuid as attribute to table row
     $tr.attr('data-uuid', res.name);
     $('tbody').append($tr);
@@ -138,7 +140,7 @@ $('tbody').on('click', '.removeBtn', function(evt){
 
  // remove from firebase
   var uuid = $tr.data('uuid');
-  var url = 'https://address-book-application.firebaseio.com/contactList/' + uuid + '.json';
+  var url = usersFbUrl + uuid + '.json';
   $.ajax(url, {type: 'DELETE'});
 });
 

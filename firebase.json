@@ -1,0 +1,9 @@
+{
+  "firebase": "address-book-application",
+  "public": ".",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}
