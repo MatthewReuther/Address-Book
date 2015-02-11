@@ -5,7 +5,8 @@
   "main": "public/index.html",
   "scripts": {
     "test": "./node_modules/karma/bin/karma start",
-    "test-once": "npm run test -- --single-run"
+    "test-once": "npm run test -- --single-run",
+    "deploy": "firebase --email ${FIREBASE_EMAIL} --password ${FIREBASE_PASSWORD} deploy"
   },
   "repository": {
     "type": "git",

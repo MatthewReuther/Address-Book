@@ -13,8 +13,12 @@ after_script:
   - cat ./coverage/PhantomJS*/lcov.info | ./node_modules/codeclimate-test-reporter/bin/codeclimate.js
 after_success:
   - npm install -g firebase-tools
-  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; && then firebase deploy; fi
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then npm run deploy; fi
 env:
   global:
-    - secure: Dqr8gdC1/lq1AtqIcHWn06VpucGGpSl7D5qCaG8qU9w+n3dyTp2unxDzzFff+aoSZ2ekgOX2Tku/rbxeXJmOgtPeJgnhkattiGFl12WWXxoK3Inf5c0LEZ/A/z/cvggxDkSo3t6NcPgmDKARnFTA27TYRQuA93Aso3Yd5CFXFUk=
-    - secure: H/YS2XAqxaPoLM9eGRY+ylRyTssYj3aVtse2+sa2gga6Tcxpmbb7MHnQd0dIrtRN22ZI+IBgiTIttD+F8d86sU6CTPhMsFRfHtPtUPxIcYpEAHfIlt470oTyTPEAOtLlhqlFcwsNajMCWY9TtUrrhnxGA8sqKc8Ejoc4t+iGQIQ=
+  - secure: Dqr8gdC1/lq1AtqIcHWn06VpucGGpSl7D5qCaG8qU9w+n3dyTp2unxDzzFff+aoSZ2ekgOX2Tku/rbxeXJmOgtPeJgnhkattiGFl12WWXxoK3Inf5c0LEZ/A/z/cvggxDkSo3t6NcPgmDKARnFTA27TYRQuA93Aso3Yd5CFXFUk=
+  - secure: H/YS2XAqxaPoLM9eGRY+ylRyTssYj3aVtse2+sa2gga6Tcxpmbb7MHnQd0dIrtRN22ZI+IBgiTIttD+F8d86sU6CTPhMsFRfHtPtUPxIcYpEAHfIlt470oTyTPEAOtLlhqlFcwsNajMCWY9TtUrrhnxGA8sqKc8Ejoc4t+iGQIQ=
+  - secure: BtEF/2fnAgZGsnl3JVZxGdM5fS1ZW5c4e+eLJumKuLNljZeAIiollcf4P2QcE9Uc91BtH14zHZBqTlc6oZp+eDBcTcYxr76AuezbGwlGWHcHodxdAujRXbeqz17eAEIv2GMl2GWLpQvP1y7BY7XVVA1NB+2jeVfxu9H6ukWlUiw=
+  - secure: IUBV+6GE17n1xFN6Gmy7t/1M5xNlAMD6kpejqtyyNewioi7qi4Ysgf7oJiWcwKsAJRLUukNGUqL3+zGOFaf0frfike0OvB926LzQA2fGAqWZ5wCA48Sm5n6njR6CVz236NZCMyykFmfnUoqKWENWAXouqnYagfrTBJk98Yg9+2I=
+  - secure: XlOk8CWdnGK2zhaLUaouVBRNlYEN+rsdKYc2jR0xlChFr31o0WPuQ1ap6/6fj9poY1tXeaUMJGqLC/TdcyyQxHiQ3szjysHz1t4U+5I3+0B8d0e1YrBx7aFqX1vmkEq83HJ5RZxARNdiSDIFcVYCoWkfLbp5EE1DmsIlebPg9rc=
+  - secure: fqFgFP/NJAOunvPxUCG0oXVBIGxb4dlywFpki03DOJp1eVaFfrVQ1Ahb12Ue7vqcOatWE1sdS0yDABkSHsLwHpwTf7Tz0FY/OvF5TJ/sA+b29P9bGNUAQZjn/L8nUd3QK2/zUFXM5U494NuYeS4k6tWoG1AB1ajwbPCpGdpms2I=
