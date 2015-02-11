@@ -1,3 +1,5 @@
+/* jshint browser: true, jquery: true */
+
 'use strict'
 
 $(document).ready(function() {
@@ -6,6 +8,79 @@ $(document).ready(function() {
      $('#newContactForm').show();
   });
 });
+
+var FIREBASE_URL   = 'address-book-application.firebaseio.com/contactList',
+    mainUrl        = 'address-book-application.firebaseio.com',
+    fb             = new Firebase(mainUrl),
+    usersFbUrl;
+
+///starts the login in piece
+if (fb.getAuth()) {
+  $('.login').remove();
+  $('.app').toggleClass('hidden');
+
+  $.get(FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data/contactList.json', function(data){
+    if(data !== null) {
+      Object.keys(data).forEach(function(uuid) {
+        addContactToTable(uuid, data[uuid]);
+      });
+    }
+  });
+}
+
+$('.login input[type="button"]').click(function () {
+  var $loginForm = $('.loginForm'),
+      email      = $loginForm.find('[type="email"]').val(),
+      pass       = $loginForm.find('[type="password"]').val(),
+      data       = {email: email, password: pass};
+
+  registerAndLogin(data, function (err, auth) {
+    if (err) {
+      $('.error').text(err);
+    } else {
+      location.reload(true);
+    }
+  });
+});
+
+$('.login form').submit(function(event){
+  var $loginForm = $(event.target),
+      email      = $loginForm.find('[type="email"]').val(),
+      pass       = $loginForm.find('[type="password"]').val(),
+      data       = {email: email, password: pass};
+
+  event.preventDefault();
+
+  fb.authWithPassword(data, function(err, auth) {
+    if (err) {
+      $('.error').text(err);
+    } else {
+      location.reload(true);
+    }
+  });
+});
+
+$('.logout').click(function (){
+  fb.unauth();
+  location.reload(true);
+});
+
+function registerAndLogin(obj, cb) {
+  fb.createUser(obj, function(err) {
+    if (!err) {
+      fb.authWithPassword(obj, function (err, auth){
+        if (!err) {
+          cb(null, auth);
+        } else {
+          cb(err);
+        }
+      });
+    } else {
+      cb(err);
+    }
+  });
+}
+
 
 $.get('https://address-book-application.firebaseio.com/contactList.json', function(res){
   Object.keys(res).forEach(function(uuid){
@@ -39,9 +114,8 @@ $('#submitNewContact').on('click', function(event){
   var $tr = $('<tr><td><img src="'+ contactPhoto + '"/></td><td>' + contactName + '</td><td>' + contactPhone + '</td><td>'+ contactEmail +'</td><td>'+ contactTwitter +'</td><td><button class="removeBtn">Remove</button><td></tr>');
 
   // post form data to firebase url
-  var url = 'https://address-book-application.firebaseio.com/contactList.json';
   var data = JSON.stringify({name: contactName, phone: contactPhone, email: contactEmail, twitter: contactTwitter, photoUrl: contactPhoto});
-  $.post(url, data, function(res){
+  $.post(FIREBASE_URL, data, function(res){
     // add firebase uuid as attribute to table row
     $tr.attr('data-uuid', res.name);
     $('tbody').append($tr);
