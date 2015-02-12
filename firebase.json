@@ -1,6 +1,6 @@
 {
   "firebase": "address-book-application",
-  "public": ".",
+  "public": "public",
   "ignore": [
     "firebase.json",
     "**/.*",

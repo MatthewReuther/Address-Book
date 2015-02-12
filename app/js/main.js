@@ -9,8 +9,7 @@ $(document).ready(function() {
   });
 });
 
-var FIREBASE_URL   = 'https//address-book-application.firebaseio.com/contactList',
-    mainUrl        = 'https://address-book-application.firebaseio.com',
+var FIREBASE_URL   = 'https//address-book-application.firebaseio.com',
     fb             = new Firebase(mainUrl),
     usersFbUrl;
 
@@ -19,12 +18,13 @@ if (fb.getAuth()) {
   $('.login').remove();
   $('.app').toggleClass('hidden');
 
-  usersFbUrl = mainUrl + '/users/' + fb.getAuth().uid + '/data/';
+  usersFbUrl = FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data';
 
-  $.get(usersFbUrl + 'contactList/.json', function(data){
+    // load user's contacts from the firebase database
+  $.get(usersFbUrl + '/.json', function(res){
   if(data !== null) {
-    Object.keys(data).forEach(function(uuid) {
-      addRowToTable(uuid, data[uuid]);
+    Object.keys(res).forEach(function(uuid) {
+      addRowToTable(uuid, res[uuid]);
     });
    }
  });
