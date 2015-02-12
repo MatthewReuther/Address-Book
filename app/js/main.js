@@ -12,6 +12,7 @@ $(document).ready(function() {
 var FIREBASE_URL   = "https//address-book-application.firebaseio.com/friends.json",
     mainUrl        = "https://address-book-application.firebaseio.com",
     fb             = new Firebase(mainUrl),
+    token,
     usersFbUrl;
 
 ///starts the login in piece
@@ -19,9 +20,11 @@ if (fb.getAuth()) {
   $('.login').remove();
   $('.app').toggleClass('hidden');
 
+  token = fb.getAuth().token,
+
   usersFbUrl = mainUrl + '/users/' + fb.getAuth().uid + '/data/';
 
-  $.get(usersFbUrl + 'friends/.json', function(res){
+  $.get(usersFbUrl + 'friends/.json?auth=' + token, function(res){
     Object.keys(res).forEach(function(uuid) {
       addRowToTable(uuid, res[uuid]);
     });
@@ -110,7 +113,7 @@ $('#submitNewContact').on('click', function(event){
 
   var data = JSON.stringify({name: contactName, phone: contactPhone, email: contactEmail, twitter: contactTwitter, photoUrl: contactPhoto});
 
-  $.post(usersFbUrl + '/friends/.json', data, function(res){
+  $.post(usersFbUrl + '/friends/.json?auth=' + token, data, function(res){
     // add firebase uuid as attribute to table row
     $tr.attr('data-uuid', res.name);
     $('tbody').append($tr);
@@ -134,8 +137,6 @@ $('tbody').on('click', '.removeBtn', function(evt){
 
  // remove from firebase
   var uuid = $tr.data('uuid');
-  var url = usersFbUrl + '/friends/' + uuid + '.json';
+  var url = usersFbUrl + '/friends/' + uuid + '.json?auth=' + token;
   $.ajax(url, {type: 'DELETE'});
 });
-
-
