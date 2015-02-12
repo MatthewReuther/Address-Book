@@ -9,8 +9,8 @@ $(document).ready(function() {
   });
 });
 
-var FIREBASE_URL   = 'https//address-book-application.firebaseio.com/contactList',
-    mainUrl        = 'https://address-book-application.firebaseio.com',
+var FIREBASE_URL   = "https//address-book-application.firebaseio.com/friends.json",
+    mainUrl        = "https://address-book-application.firebaseio.com",
     fb             = new Firebase(mainUrl),
     usersFbUrl;
 
@@ -21,13 +21,12 @@ if (fb.getAuth()) {
 
   usersFbUrl = mainUrl + '/users/' + fb.getAuth().uid + '/data/';
 
-  $.get(usersFbUrl + 'contactList/.json', function(data){
-  if(data !== null) {
-    Object.keys(data).forEach(function(uuid) {
-      addRowToTable(uuid, data[uuid]);
+  $.get(usersFbUrl + 'friends/.json', function(res){
+    Object.keys(res).forEach(function(uuid) {
+      addRowToTable(uuid, res[uuid]);
     });
    }
- });
+ );
 }
 
 $('.login input[type="button"]').click(function () {
@@ -108,8 +107,10 @@ $('#submitNewContact').on('click', function(event){
   var $tr = $('<tr><td><img src="'+ contactPhoto + '"/></td><td>' + contactName + '</td><td>' + contactPhone + '</td><td>'+ contactEmail +'</td><td>'+ contactTwitter +'</td><td><button class="removeBtn">Remove</button><td></tr>');
 
   // post form data to firebase url
+
   var data = JSON.stringify({name: contactName, phone: contactPhone, email: contactEmail, twitter: contactTwitter, photoUrl: contactPhoto});
-  $.post(usersFbUrl + 'contactList/.json', data, function(res){
+
+  $.post(usersFbUrl + '/friends/.json', data, function(res){
     // add firebase uuid as attribute to table row
     $tr.attr('data-uuid', res.name);
     $('tbody').append($tr);
@@ -126,13 +127,15 @@ function addRowToTable(uuid, obj){
 
 // remove btn on table row
 $('tbody').on('click', '.removeBtn', function(evt){
+
   // remove from table
   var $tr = $(evt.target).closest('tr');
   $tr.remove();
-  consol.log('remove.click');
+
  // remove from firebase
   var uuid = $tr.data('uuid');
-  var url = usersFbUrl + 'contactList/' + uuid + '/.json';
+  var url = usersFbUrl + '/friends/' + uuid + '.json';
   $.ajax(url, {type: 'DELETE'});
 });
+
 

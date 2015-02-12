@@ -18,7 +18,7 @@ cp bower_components/jquery/dist/jquery.min.js public/vendor
 cp bower_components/lodash/lodash.min.js public/vendor
 cp bower_components/firebase/firebase.js public/vendor
 
-Check config settings to see if jquery is properly referenced
+#Check config settings to see if jquery is properly referenced
 cp bower_components/jquery/dist/jquery.min.map public/vendor
 
 
