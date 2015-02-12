@@ -2,8 +2,16 @@
 
 'use strict'
 
-var FIREBASE_URL   = 'https//address-book-application.firebaseio.com',
-    fb             = new Firebase(FIREBASE_URL),
+$(document).ready(function() {
+  $('#newContactForm').hide();
+  $('#addContact').click(function() {
+     $('#newContactForm').show();
+  });
+});
+
+var FIREBASE_URL   = 'https//address-book-application.firebaseio.com/contactList',
+    mainUrl        = 'https://address-book-application.firebaseio.com',
+    fb             = new Firebase(mainUrl),
     usersFbUrl;
 
 ///starts the login in piece
@@ -11,26 +19,24 @@ if (fb.getAuth()) {
   $('.login').remove();
   $('.app').toggleClass('hidden');
 
-  usersFbUrl = FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data';
+  usersFbUrl = mainUrl + '/users/' + fb.getAuth().uid + '/data/';
 
-    // load user's contacts from the firebase database
-  $.get(FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data/friends.json', function(data){
-    if(data !== null) {
-      Object.keys(data).forEach(function(uuid) {
-        addRowToTable(uuid, data[uuid]);
-      });
-    }
-  });
+  $.get(usersFbUrl + 'contactList/.json', function(data){
+  if(data !== null) {
+    Object.keys(data).forEach(function(uuid) {
+      addRowToTable(uuid, data[uuid]);
+    });
+   }
+ });
 }
-// click login buttoni
-$('body').on('click', '.loginBtn', function(event) {
-  event.preventDefault();
 
-  var email = $('#logInEmail').val();
-  var password = $('#password').val();
+$('.login input[type="button"]').click(function () {
+  var $loginForm = $('.loginForm'),
+      email      = $loginForm.find('[type="email"]').val(),
+      pass       = $loginForm.find('[type="password"]').val(),
+      data       = {email: email, password: pass};
 
-//authenticate email and password
-  fb.authWithPassword({email: email, password: password}, function(err, auth) {
+  registerAndLogin(data, function (err, auth) {
     if (err) {
       $('.error').text(err);
     } else {
@@ -39,51 +45,43 @@ $('body').on('click', '.loginBtn', function(event) {
   });
 });
 
-// click register button
-$('.registerBtn').on('click', function(event) {
+$('.login form').submit(function(event){
+  var $loginForm = $(event.target),
+      email      = $loginForm.find('[type="email"]').val(),
+      pass       = $loginForm.find('[type="password"]').val(),
+      data       = {email: email, password: pass};
+
   event.preventDefault();
 
-  var email = $('#logInEmail').val();
-  var password = $('#password').val();
-
-//create new user with email and password
-fb.createUser({email: email, password: password}, function(err, auth){
-    if(!err){
-      //log in
-      fb.authWithPassword({email: email, password: password}, function(err, auth){
-          location.reload(true);
-      });
+  fb.authWithPassword(data, function(err, auth) {
+    if (err) {
+      $('.error').text(err);
     } else {
-      alert("User already exists");
       location.reload(true);
     }
   });
-
 });
 
-
-// click logout button
-$('.logout').on('click', function() {
-  console.log("clicked logout button");
-  // execute unauth
+$('.logout').click(function (){
   fb.unauth();
-  //refresh the page
   location.reload(true);
 });
 
-
-
-//////////////////////////////////////////////////////
-/////////Logic for contact form and address book////
-/////////////////////////////////////////////////////
-
-$(document).ready(function() {
-  $('#newContactForm').hide();
-  $('#addContact').click(function() {
-     $('#newContactForm').show();
+function registerAndLogin(obj, cb) {
+  fb.createUser(obj, function(err) {
+    if (!err) {
+      fb.authWithPassword(obj, function (err, auth){
+        if (!err) {
+          cb(null, auth);
+        } else {
+          cb(err);
+        }
+      });
+    } else {
+      cb(err);
+    }
   });
-});
-
+}
 
  // when submit btn is clicked on Contact Form
 $('#submitNewContact').on('click', function(event){
@@ -111,7 +109,7 @@ $('#submitNewContact').on('click', function(event){
 
   // post form data to firebase url
   var data = JSON.stringify({name: contactName, phone: contactPhone, email: contactEmail, twitter: contactTwitter, photoUrl: contactPhoto});
-  $.post(FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data/friends.json', data, function(res){
+  $.post(usersFbUrl + 'contactList/.json', data, function(res){
     // add firebase uuid as attribute to table row
     $tr.attr('data-uuid', res.name);
     $('tbody').append($tr);
@@ -131,10 +129,10 @@ $('tbody').on('click', '.removeBtn', function(evt){
   // remove from table
   var $tr = $(evt.target).closest('tr');
   $tr.remove();
-
+  consol.log('remove.click');
  // remove from firebase
   var uuid = $tr.data('uuid');
-  var url = FIREBASE_URL + '/users/' + fb.getAuth().uid + '/data/friends/' + uuid + '.json';
+  var url = usersFbUrl + 'contactList/' + uuid + '/.json';
   $.ajax(url, {type: 'DELETE'});
 });
 
