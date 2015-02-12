@@ -2,15 +2,8 @@
 
 'use strict'
 
-$(document).ready(function() {
-  $('#newContactForm').hide();
-  $('#addContact').click(function() {
-     $('#newContactForm').show();
-  });
-});
-
 var FIREBASE_URL   = 'https//address-book-application.firebaseio.com',
-    fb             = new Firebase(mainUrl),
+    fb             = new Firebase(FIREBASE_URL),
     usersFbUrl;
 
 ///starts the login in piece
@@ -22,38 +15,21 @@ if (fb.getAuth()) {
 
     // load user's contacts from the firebase database
   $.get(usersFbUrl + '/.json', function(res){
-  if(data !== null) {
     Object.keys(res).forEach(function(uuid) {
       addRowToTable(uuid, res[uuid]);
     });
-   }
- });
+  });
 }
 
-$('.login input[type="button"]').click(function () {
-  var $loginForm = $('.loginForm'),
-      email      = $loginForm.find('[type="email"]').val(),
-      pass       = $loginForm.find('[type="password"]').val(),
-      data       = {email: email, password: pass};
-
-  registerAndLogin(data, function (err, auth) {
-    if (err) {
-      $('.error').text(err);
-    } else {
-      location.reload(true);
-    }
-  });
-});
-
-$('.login form').submit(function(event){
-  var $loginForm = $(event.target),
-      email      = $loginForm.find('[type="email"]').val(),
-      pass       = $loginForm.find('[type="password"]').val(),
-      data       = {email: email, password: pass};
-
+// click login buttoni
+$('body').on('click', '.loginBtn', function(event) {
   event.preventDefault();
 
-  fb.authWithPassword(data, function(err, auth) {
+  var email = $('#logInEmail').val();
+  var password = $('#password').val();
+
+//authenticate email and password
+  fb.authWithPassword({email: email, password: password}, function(err, auth) {
     if (err) {
       $('.error').text(err);
     } else {
@@ -62,31 +38,48 @@ $('.login form').submit(function(event){
   });
 });
 
-$('.logout').click(function (){
+// click register button
+$('.registerBtn').on('click', function(event) {
+  event.preventDefault();
+
+  var email = $('#logInEmail').val();
+  var password = $('#password').val();
+
+//create new user with email and password
+fb.createUser({email: email, password: password}, function(err, auth){
+    if(!err){
+      //log in
+      fb.authWithPassword({email: email, password: password}, function(err, auth){
+          location.reload(true);
+      });
+    } else {
+      alert("User already exists");
+      location.reload(true);
+    }
+  });
+
+});
+
+
+// click logout button
+$('.logout').on('click', function() {
+  console.log("clicked logout button");
+  // execute unauth
   fb.unauth();
+  //refresh the page
   location.reload(true);
 });
 
-function registerAndLogin(obj, cb) {
-  fb.createUser(obj, function(err) {
-    if (!err) {
-      fb.authWithPassword(obj, function (err, auth){
-        if (!err) {
-          cb(null, auth);
-        } else {
-          cb(err);
-        }
-      });
-    } else {
-      cb(err);
-    }
-  });
-}
 
 
-$.get(usersFbUrl + 'contactList/.json', function(res){
-  Object.keys(res).forEach(function(uuid){
-    addRowToTable(uuid,res[uuid]);
+//////////////////////////////////////////////////////
+/////////Logic for contact form and address book////
+/////////////////////////////////////////////////////
+
+$(document).ready(function() {
+  $('#newContactForm').hide();
+  $('#addContact').click(function() {
+     $('#newContactForm').show();
   });
 });
 
@@ -117,7 +110,7 @@ $('#submitNewContact').on('click', function(event){
 
   // post form data to firebase url
   var data = JSON.stringify({name: contactName, phone: contactPhone, email: contactEmail, twitter: contactTwitter, photoUrl: contactPhoto});
-  $.post(usersFbUrl + 'contactList/.json', data, function(res){
+  $.post(usersFbUrl + '/.json', data, function(res){
     // add firebase uuid as attribute to table row
     $tr.attr('data-uuid', res.name);
     $('tbody').append($tr);
@@ -140,7 +133,7 @@ $('tbody').on('click', '.removeBtn', function(evt){
 
  // remove from firebase
   var uuid = $tr.data('uuid');
-  var url = usersFbUrl + uuid + '.json';
+  var url = usersFbUrl + '/' + uuid + '.json';
   $.ajax(url, {type: 'DELETE'});
 });
 
